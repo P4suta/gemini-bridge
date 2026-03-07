@@ -6,6 +6,8 @@ export interface AISummaryResult {
   model: string;
 }
 
+const AI_MODEL = '@cf/meta/llama-3.1-8b-instruct' as const;
+
 export class WorkersAIClient {
   constructor(private readonly ai: Ai) {}
 
@@ -22,24 +24,16 @@ export class WorkersAIClient {
       zh: 'Chinese',
     };
 
-    const response = await this.ai.run('@cf/meta/llama-3.1-8b-instruct', {
-      messages: [
-        {
-          role: 'system',
-          content: `You are a technical blog summarizer. Generate a concise summary (2-3 sentences) in ${languageNames[targetLanguage]}. The input is in Gemini protocol's gemtext format. Focus on the key technical concepts and takeaways.`,
-        },
-        {
-          role: 'user',
-          content: gemtext,
-        },
-      ],
-      max_tokens: 256,
-    });
+    const summary = await this.runChat(
+      `You are a technical blog summarizer. Generate a concise summary (2-3 sentences) in ${languageNames[targetLanguage]}. The input is in Gemini protocol's gemtext format. Focus on the key technical concepts and takeaways.`,
+      gemtext,
+      256,
+    );
 
     return {
-      summary: (response as { response: string }).response,
+      summary,
       language: targetLanguage,
-      model: '@cf/meta/llama-3.1-8b-instruct',
+      model: AI_MODEL,
     };
   }
 
@@ -47,19 +41,20 @@ export class WorkersAIClient {
    * OGP description用の短い要約を生成する。
    */
   async generateOGPDescription(gemtext: string): Promise<string> {
-    const response = await this.ai.run('@cf/meta/llama-3.1-8b-instruct', {
+    return this.runChat(
+      'Generate a concise meta description (max 160 characters) in the same language as the input. Focus on what the article is about. Do not include quotes or formatting.',
+      gemtext,
+      64,
+    );
+  }
+
+  private async runChat(systemPrompt: string, userContent: string, maxTokens: number): Promise<string> {
+    const response = await this.ai.run(AI_MODEL, {
       messages: [
-        {
-          role: 'system',
-          content:
-            'Generate a concise meta description (max 160 characters) in the same language as the input. Focus on what the article is about. Do not include quotes or formatting.',
-        },
-        {
-          role: 'user',
-          content: gemtext,
-        },
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent },
       ],
-      max_tokens: 64,
+      max_tokens: maxTokens,
     });
 
     return (response as { response: string }).response;

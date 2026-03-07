@@ -167,3 +167,13 @@ func TestRenderNodes_XSSEscape(t *testing.T) {
 		t.Errorf("XSS not escaped in link label: %q", result)
 	}
 }
+
+func TestRenderNodes_JavascriptURLBlocked(t *testing.T) {
+	nodes := []model.Node{
+		model.Link{URL: "javascript:alert(1)", Label: "Click me"},
+	}
+	result := RenderNodes(nodes)
+	if strings.Contains(result, "javascript:") {
+		t.Errorf("javascript: URL should be blocked, got %q", result)
+	}
+}

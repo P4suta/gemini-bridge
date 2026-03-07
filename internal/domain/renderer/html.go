@@ -39,12 +39,12 @@ func RenderNodes(nodes []model.Node) string {
 			if label == "" {
 				label = n.URL
 			}
-			escURL := html.EscapeString(n.URL)
+			// gemini:// リンクはHTTPS変換（エスケープ前に実施）
+			safeURL := sanitizeURL(convertGeminiURL(n.URL))
+			escURL := html.EscapeString(safeURL)
 			escLabel := html.EscapeString(label)
-			// gemini:// リンクはHTTPS変換
-			displayURL := convertGeminiURL(escURL)
 			fmt.Fprintf(&b, "<p class=\"gemini-link\"><a href=\"%s\">%s</a></p>\n",
-				displayURL, escLabel)
+				escURL, escLabel)
 
 		case model.Heading:
 			esc := html.EscapeString(n.Content)
@@ -84,6 +84,25 @@ func RenderNodes(nodes []model.Node) string {
 	}
 
 	return b.String()
+}
+
+// sanitizeURL は安全でないURLスキームを除去する。
+func sanitizeURL(url string) string {
+	lower := strings.ToLower(strings.TrimSpace(url))
+	// 許可するスキーム
+	if strings.HasPrefix(lower, "https://") ||
+		strings.HasPrefix(lower, "http://") ||
+		strings.HasPrefix(lower, "gemini://") ||
+		strings.HasPrefix(lower, "mailto:") ||
+		strings.HasPrefix(lower, "/") {
+		return url
+	}
+	// スキームが無い相対パスは許可
+	if !strings.Contains(strings.SplitN(lower, "/", 2)[0], ":") {
+		return url
+	}
+	// javascript: 等の危険なスキームは除去
+	return ""
 }
 
 // convertGeminiURL は gemini:// URLを https:// に変換する。

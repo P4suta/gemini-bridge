@@ -9,7 +9,7 @@ export function analyticsTracker() {
     // Analytics Engineにイベントを非同期記録（レスポンスをブロックしない）
     c.executionCtx.waitUntil(
       recordEvent(c.env.ANALYTICS, {
-        path: new URL(c.req.url).pathname,
+        path: c.req.path,
         userAgent: c.req.header('User-Agent') ?? '',
         country: c.req.header('CF-IPCountry') ?? '',
         referer: c.req.header('Referer') ?? '',

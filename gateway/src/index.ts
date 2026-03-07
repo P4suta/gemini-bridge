@@ -85,7 +85,10 @@ app.get('/api/posts/:slug/related', async (c) => {
 // APIルート: AI要約
 app.get('/api/posts/:slug/summary', async (c) => {
   const slug = c.req.param('slug');
-  const lang = (c.req.query('lang') ?? 'ja') as 'ja' | 'en' | 'zh';
+  const rawLang = c.req.query('lang') ?? 'ja';
+  const lang = (['ja', 'en', 'zh'] as const).includes(rawLang as 'ja' | 'en' | 'zh')
+    ? (rawLang as 'ja' | 'en' | 'zh')
+    : 'ja';
   const cache = c.get('cache');
 
   const cacheKey = `ai:summary:${lang}:${slug}`;

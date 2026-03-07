@@ -72,14 +72,14 @@ func (s *JsonMetadataStore) writeSeedSQL(path string, posts []model.PostMeta) er
 		fmt.Fprintf(f,
 			"INSERT INTO posts (id, slug, title, published_at, word_count, language, tags, gemtext_hash) "+
 				"VALUES ('%s', '%s', '%s', '%s', %d, '%s', '%s', '%s');\n",
-			post.Slug,
-			post.Slug,
+			escapeSQL(post.Slug),
+			escapeSQL(post.Slug),
 			escapeSQL(post.Title),
 			post.Date.Format("2006-01-02T15:04:05Z"),
 			post.WordCount,
-			post.Language,
+			escapeSQL(post.Language),
 			escapeSQL(string(tagsJSON)),
-			post.GemtextHash,
+			escapeSQL(post.GemtextHash),
 		)
 	}
 

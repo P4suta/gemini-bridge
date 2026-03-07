@@ -6,7 +6,7 @@ export function cacheControl() {
   return createMiddleware<{ Bindings: Env }>(async (c, next) => {
     await next();
 
-    const path = new URL(c.req.url).pathname;
+    const path = c.req.path;
 
     // 静的アセットは長期キャッシュ
     if (path.startsWith('/assets/')) {

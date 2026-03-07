@@ -18,21 +18,11 @@ func NewFileSystemWriter(baseDir string) *FileSystemWriter {
 }
 
 func (w *FileSystemWriter) Write(path string, content io.Reader) error {
-	fullPath := filepath.Join(w.baseDir, path)
-
-	// ディレクトリの自動作成
-	if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
-		return err
-	}
-
-	f, err := os.Create(fullPath)
+	data, err := io.ReadAll(content)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-
-	_, err = io.Copy(f, content)
-	return err
+	return w.WriteBytes(path, data)
 }
 
 func (w *FileSystemWriter) WriteBytes(path string, data []byte) error {

@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"bytes"
 	"strings"
 	"unicode/utf8"
 
@@ -99,7 +100,7 @@ func (p *BuildPipeline) processFile(path string) (model.PostMeta, error) {
 	}
 
 	// パース
-	nodes, err := parser.Parse(strings.NewReader(string(raw)))
+	nodes, err := parser.Parse(bytes.NewReader(raw))
 	if err != nil {
 		return model.PostMeta{}, err
 	}
