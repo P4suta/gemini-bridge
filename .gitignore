@@ -1,0 +1,50 @@
+# Go
+/gemini-bridge
+*.exe
+*.test
+*.out
+*.prof
+go.work
+go.work.sum
+vendor/
+
+# TypeScript / Node.js (Gateway)
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Cloudflare Workers / Wrangler
+.wrangler/
+.dev.vars
+wrangler.toml
+!wrangler.toml.example
+
+# Build output
+/output/
+/public/
+/build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# Misc
+*.log
+tmp/
+.cache/
